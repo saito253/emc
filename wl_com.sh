@@ -36,18 +36,15 @@ echo -n INPUT_MCS_index[0, 1, 2, 3, 4, 5, 6, 7]:
 fi
 read rate
 
-echo -n INPUT_CHANNEL[1-14]:
+echo -n INPUT_CHANNEL[1-13 max channel]: # max channel: JP: 14,  US/CA: 11, EU:13
 read ch
 
 if [ $trx = "tx" ]; then
-echo -n INPUT_POWER[-1...12]:
+	echo -n INPUT_POWER[-1 max power...12]:
 read pw
 else
 pw="-1"
 fi
-
-echo -n INPUT_SLEEP_TIME[0-99]:
-read slp
 
 echo "-------------- Input summary ------------"
 echo "TRX :           "$trx
@@ -55,7 +52,6 @@ echo "Mode :          "$mode
 echo "Rate or Index : "$rate
 echo "Channel :       "$ch
 echo "Power :         "$pw
-echo "Sleep Time :    "$slp
 echo "-----------------------------------------"
 
 sudo ./wl ver
@@ -87,11 +83,16 @@ sudo ./wl scansuppress 1
 
 if [ $trx = "tx" ]; then
 sudo ./wl pkteng_start 00:11:22:33:44:55 tx 100 1024 0
-sleep $slp
+echo -n INPUT_STOP[Enter]:
+read stop
 sudo ./wl pkteng_stop tx
 elif [ $trx = "rx" ]; then
 sudo ./wl pkteng_start 00:11:22:33:44:55 rx
-sleep $slp
+echo -n INPUT_STOP[Enter]:
+read stop
 sudo ./wl counters
 sudo ./wl pkteng_stop rx
 fi
+
+sudo ./wl down
+sudo hciconfig hci0 down 			        # command to disable the HCI
