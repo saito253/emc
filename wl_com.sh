@@ -62,7 +62,7 @@ sudo ./wl country ALL		    # US/911, EU/116, JP/101, CA/938
 sudo ./wl band b
 if [ $mode = "b" ]; then 	    #802.11b
 sudo ./wl 2g_rate -r $rate          # Note: (where r can be 1, 2, 5.5 or 11)
-elif [ $mode = "b" ]; then 	    #802.11g
+elif [ $mode = "g" ]; then 	    #802.11g
 sudo ./wl 2g_rate -r $rate          # Note: (where r can be 6, 9, 12, 18, 24, 36, 48, 54)
 elif [ $mode = "n" ]; then 	    #802.11n
 sudo ./wl 2g_rate -h $rate -b 20    # Note: (where h can be 0, 1, 2, 3, 4, 5, 6 or 7)
