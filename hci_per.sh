@@ -2,6 +2,8 @@
 
 # hcitool, hciconfig, hciattach
 
+bluetoothctl version
+
 sudo ifconfig wlan0 down
 sudo ./wl down
 
@@ -11,7 +13,7 @@ sudo hciconfig hci0 up 				# command to enable the HCI
 sudo hcitool -i hci0 cmd 0x03 0x003 		# HCI_Reset 
 sudo hcitool -i hci0 cmd 0x06 0x003 		# HCI_Enable_Device_Under_Test_Mode 
 sudo hcitool -i hci0 cmd 0x03 0x005 0x000	# HCI_Set_Event_Filter 
-sudo hcitool -i hci0 cmd 0x03 0x01A 0x003	# HCI_Write_Scan_Enable 
+sudo hcitool -i hci0 cmd 0x03 0x01A 		# HCI_Write_Scan_Enable 
 
 echo -n INPUT_TRX[tx, rx]:
 read trx
@@ -46,17 +48,24 @@ echo -n INPUT_CHANNEL[0x00:2402MHz,0x13:2440MHz,0x27:2480MHz]:
 read ch
 
 if [ $trx = "tx" ]; then
-sudo hcitool -i hci0 cmd 0x08 0x1e $ch 0x03 0x07 # LE Transmitter Test
+sudo hcitool -i hci0 cmd 0x08 0x1e $ch 0x03 0x00 # LE Transmitter Test
+#sudo hcitool -i hci0 cmd 0x08 0x34 $ch 0x03 0x00 # LE Enhanced Transmitter Test
 elif [ $trx = "rx" ]; then
 sudo hcitool -i hci0 cmd 0x08 0x1d $ch           # LE Receiver Test
-#sudo hcitool -i hci0 cmd 0x08 0x0008 1e 02 01 1a 1a ff 4c 00 02 15 e2 c5 6d b5 df fb 48 d2 b0 60 d0 f5 a7 10 96 e0 00 00 00 00 c5 00 00 00 00 00 00 00 00 00 00 00 00 00
-#sudo hcitool -i hci0 cmd 0x08 0x0008 1e 02 01 1a 1a ff 4c 00 02 15 e2 c5 6d b5 df fb 48 d2 b0 60 d0 f5 a7 10 96 e0 00 00 00 00 c5 00 00 00 00 00 00 00 00 00 00 00 00 00
-#sudo hcitool cmd 0x03 0x03
-#sudo hcitool cmd 0x08 0x1e 0x10 0x0
+#sudo hcitool -i hci0 cmd 0x08 0x33 $ch           # LE Enhanced Receiver Test
 fi
 
 echo -n INPUT_STOP[Enter]:
 read stop
+#sudo hcitool -i hci0 cmd 0x03 0x035     # HCI_Host_Number_Of_Completed_Packets
+result=$(sudo hcitool -i hci0 cmd 0x08 0x1f)	# LE Test End
+echo $result
+if [ $trx = "rx" ]; then
+result_d=$(echo $result | nawk '{print "obase=10; ibase=16; "$NF$(NF-1)}' | bc)
+echo "--------------------------------------------"
+echo "   Recived number of packets : "$result_d
+echo "--------------------------------------------"
+fi
 sudo ./wl down
 sudo hciconfig hci0 down 			        # command to disable the HCI
 
